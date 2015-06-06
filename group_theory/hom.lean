@@ -36,7 +36,6 @@ definition is_hom (f : A → B) [h : is_hom_class f] : homomorphic f :=
            @is_hom_class.is_hom A B s1 s2 f h
 
 definition ker (f : A → B) [h : is_hom_class f] : set A := {a : A | f a = 1}
-check @ker
 
 definition isomorphic (f : A → B) := injective f ∧ homomorphic f
 structure is_iso_class [class] (f : A → B) extends is_hom_class f : Type :=
@@ -101,7 +100,7 @@ lemma ker.mul_closed : mul_closed_on (ker f) :=
 lemma ker.normal : same_left_right_coset (ker f) :=
       take a, funext (assume x, begin
       esimp [ker, set_of, glcoset, grcoset],
-      rewrite [*(is_hom f), comm_mul_eq_one (f a⁻¹) (f x)]
+      rewrite [*(is_hom f), mul_eq_one_iff_mul_eq_one]
       end)
 
 definition ker_is_normal_subgroup : is_normal_subgroup (ker f) :=
@@ -169,7 +168,6 @@ lemma ker_map_is_hom : homomorphic (ker_natural_map : coset_of (ker f) → B) :=
   take aK bK,
       quot.ind (λ a, quot.ind (λ b, ker_coset_hom a b) bK) aK
 
-check @subg_in_lcoset_same_lcoset
 lemma ker_coset_inj (a b : A) : (ker_natural_map ⟦a⟧ = ker_natural_map ⟦b⟧) → ⟦a⟧ = ⟦b⟧ :=
       assume Pfeq : f a = f b,
       assert Painb : a ∈ b ∘> ker f, from calc
@@ -187,5 +185,5 @@ lemma ker_map_is_inj : injective (ker_natural_map : coset_of (ker f) → B) :=
 theorem first_isomorphism_theorem : isomorphic (ker_natural_map : coset_of (ker f) → B) :=
         and.intro ker_map_is_inj ker_map_is_hom
 
-end hom_theorem        
+end hom_theorem
 end group

@@ -19,7 +19,7 @@ include finA
 definition list_to_fun [deceqA : decidable_eq A] (l : list B) (leq : length l = card A) : A → B :=
            assume x,
            let k := find x (elements_of A) in
-           have Plt : k < card A, from (find_mem (complete x)),
+           have Plt : k < card A, from (find_lt_length (complete x)),
            have Pltl : k < length l, from leq⁻¹ ▸ Plt,
            kth _ _ Pltl
 
@@ -42,8 +42,8 @@ lemma found_of_surj {f : A → B} (surj : surjective f) :
       ∀ b, let elts := elems A, k := find b (map f elts) in k < length elts :=
       λ b, let elts := elems A, img := map f elts, k := find b img in
            have Pin : b ∈ img, from mem_map_of_surj surj b,
-           assert Pfound : k < length img, from find_mem (mem_map_of_surj surj b),
-           len_map f elts ▸ Pfound
+           assert Pfound : k < length img, from find_lt_length (mem_map_of_surj surj b),
+           length_map f elts ▸ Pfound
 
 definition right_inv {f : A → B} (surj : surjective f) : B → A :=
            λ b, let elts := elems A, k := find b (map f elts) in
@@ -64,8 +64,11 @@ lemma found_of_map {f : A → B} (b : B) :
               exact found_of_map l (lt_of_succ_lt_succ P)
               end)
 
+lemma id_of_right_inv' {f : A → B} (surj : surjective f) (b : B) : f (right_inv surj b) = b :=
+      found_of_map b (elems A) (found_of_surj surj b)
+
 lemma id_of_right_inv {f : A → B} (surj : surjective f) : f ∘ (right_inv surj) = id :=
-      funext (λ b, found_of_map b (elems A) (found_of_surj surj b))
+      funext (id_of_right_inv' surj)
 end surj_inv
 
 -- inj functions for equal card types are also surj and therefore bij

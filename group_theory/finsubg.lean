@@ -32,7 +32,6 @@ structure is_finsubg [class] (H : finset G) : Type :=
           (mul_closed : finset_mul_closed_on H)
           (has_inv : finset_has_inv H)
 set_option pp.full_names true
-check @is_finsubg 
 
 lemma finsubg_has_one (H : finset G) [h : is_finsubg H] : 1 ∈ H :=
       @is_finsubg.has_one G _ H h
@@ -88,7 +87,7 @@ lemma fin_lcoset_same (x a : A) : x ∈ (fin_lcoset H a) = (fin_lcoset H x = fin
 lemma fin_mem_lcoset (g : A) : g ∈ fin_lcoset H g :=
       have P : g ∈ g ∘> ts H, from and.left (subg_in_coset_refl g),
       assert P1 : g ∈ ts (fin_lcoset H g), from eq.symm (fin_lcoset_eq g) ▸ P,
-      eq.symm (@mem_eq_mem_to_set _ _ _ g) ▸ P1
+      eq.symm (mem_eq_mem_to_set _ g) ▸ P1
 lemma fin_lcoset_subset {S : finset A} (Psub : S ⊆ H) : ∀ x, x ∈ H → fin_lcoset S x ⊆ H :=
       assert Psubs : set.subset (ts S) (ts H), from subset_eq_to_set_subset S H ▸ Psub,
       take x, assume Pxs : x ∈ ts H,
@@ -98,6 +97,8 @@ lemma fin_lcoset_subset {S : finset A} (Psub : S ⊆ H) : ∀ x, x ∈ H → fin
 variable {G : finset A}
 variable [is_subgG : is_subgroup (to_set G)]
 include is_subgG
+
+open finset.partition
 
 definition fin_lcoset_partition_subg (Psub : H ⊆ G) :=
       partition.mk G (fin_lcoset H) fin_lcoset_same

@@ -30,16 +30,17 @@ definition perm_inv : A → A :=
 lemma perm_inv_right : f ∘ (perm_inv perm) = id :=
       id_of_right_inv (perm_surj perm)
 lemma perm_inv_left : (perm_inv perm) ∘ f = id :=
-      left_inv_of_right_inv_of_inj perm (perm_inv_right perm)
+      have H : left_inverse f (perm_inv perm), from congr_fun (perm_inv_right perm),
+      funext (take x, right_inverse_of_injective_of_left_inverse perm H x)
 lemma perm_inv_inj : injective (perm_inv perm) :=
-      injective_of_has_left_inverse (exists.intro f (perm_inv_right perm))
-      
+      injective_of_has_left_inverse (exists.intro f (congr_fun (perm_inv_right perm)))
+
 end perm
 
 structure perm (A : Type) [h : fintype A] : Type :=
   (f : A → A) (inj : injective f)
 local attribute perm.f [coercion]
-    
+
 section perm
 variable {A : Type}
 variable [finA : fintype A]
@@ -59,7 +60,7 @@ lemma perm.has_decidable_eq [instance] : decidable_eq (perm A) :=
 
 definition perm.mul (f g : perm A) :=
            perm.mk (f∘g) (injective_compose (perm.inj f) (perm.inj g))
-definition perm.one : perm A := perm.mk id id_is_inj
+definition perm.one : perm A := perm.mk id injective_id
 definition perm.inv (f : perm A) := let inj := perm.inj f in
            perm.mk (perm_inv inj) (perm_inv_inj inj)
 
@@ -70,17 +71,16 @@ lemma perm.one_mul (p : perm A) : perm.one ^ p = p :=
 lemma perm.mul_one (p : perm A) : p ^ perm.one = p :=
       perm.cases_on p (λ f inj, rfl)
 lemma perm.left_inv (p : perm A) : (perm.inv p) ^ p = perm.one :=
-      begin rewrite [↑perm.one], generalize @id_is_inj A,
+      begin rewrite [↑perm.one], generalize @injective_id A,
       rewrite [-perm_inv_left (perm.inj p)], intros, exact rfl
       end
 lemma perm.right_inv (p : perm A) : p ^ (perm.inv p) = perm.one :=
-      begin rewrite [↑perm.one], generalize @id_is_inj A,
+      begin rewrite [↑perm.one], generalize @injective_id A,
       rewrite [-perm_inv_right (perm.inj p)], intros, exact rfl
       end
 
 definition perm_group [instance] : group (perm A) :=
            group.mk perm.mul perm.assoc perm.one perm.one_mul perm.mul_one perm.inv perm.left_inv
-check @perm_group
 
 end perm
 
@@ -88,4 +88,3 @@ section less_than
 
 end less_than
 end group
-
